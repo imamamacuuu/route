@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Petani Gateway / Console</title>
+  <meta name="description" content="Developer console for keyless AI gateway and rotating proxy pool.">
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <style>
+/* Hallmark · shape: workbench · genre: modern-minimal · theme: Console (deal 2/3, seed keyless-gateway-developer-console-2cb0·3882b40e·2026-10-29·r0) · job: try · draw: manual
+ * hero: stage · nav: edge-aligned · footer: mast · imagery: none · signature: realtime telemetry and proxy node probes · console: direct
+ * axes: dark/grotesk-sans/chromatic-amber · posture: restrained · contrast: pass · fold: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P_ H_ E_ S_ R_ V_ · weakest: console, tuned hairline borders and telemetry layout */
+
+:root {
+  color-scheme: dark;
+  --color-paper: oklch(17% 0.008 250);
+  --color-paper-2: oklch(21% 0.009 250);
+  --color-paper-3: oklch(13.5% 0.007 250);
+  --color-ink: oklch(95% 0.005 250);
+  --color-ink-2: oklch(83% 0.008 250);
+  --color-muted: oklch(71% 0.01 250);
+  --color-rule: oklch(31% 0.01 250);
+  --color-rule-2: oklch(42% 0.012 250);
+  --color-accent: oklch(82% 0.15 80);
+  --color-accent-ink: oklch(18% 0.04 75);
+  --color-accent-soft: oklch(29% 0.05 80);
+  --color-focus: oklch(82% 0.15 80);
+  --color-cool: oklch(77% 0.12 245);
+  --color-cool-soft: oklch(29% 0.05 245);
+  --color-ok: oklch(76% 0.15 150);
+  --color-ok-soft: oklch(24.5% 0.03 150);
+  --color-bad: oklch(70% 0.17 25);
+  --color-bad-soft: oklch(24.5% 0.035 25);
+  --color-shadow: oklch(0% 0 0 / 0.5);
+  --font-display: "Host Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: var(--font-display);
+  --font-mono: "Atkinson Hyperlegible Mono", ui-monospace, Menlo, Monaco, Consolas, monospace;
+  --radius-card: 6px;
+  --radius-sm: 4px;
+  --container: 1120px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { overflow-x: clip; }
+html { scrollbar-color: var(--color-rule-2) var(--color-paper-3); }
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  padding: 1.5rem 1rem 3rem 1rem;
+  min-height: 100vh;
+  caret-color: var(--color-accent);
+}
+::selection {
+  background: var(--color-accent-soft);
+  color: var(--color-ink);
+}
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  z-index: 1000;
+  transition: top 120ms ease;
+}
+.skip-link:focus { top: 0; }
+
+header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--color-rule);
+  margin-bottom: 1.25rem;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.brand-mark {
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--color-rule-2);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-paper-2);
+}
+.brand-mark svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 2;
+}
+.brand-title {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--color-ink);
+  letter-spacing: -0.01em;
+}
+.brand-sub {
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+}
+.header-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-family: var(--font-body);
+  background: var(--color-paper-2);
+  color: var(--color-ink-2);
+  border: 1px solid var(--color-rule);
+}
+.tag-ok {
+  color: var(--color-ok);
+  background: var(--color-ok-soft);
+  border-color: var(--color-ok);
+}
+.tag-warn {
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent);
+}
+.tag-bad {
+  color: var(--color-bad);
+  background: var(--color-bad-soft);
+  border-color: var(--color-bad);
+}
+.tag-cool {
+  color: var(--color-cool);
+  background: var(--color-cool-soft);
+  border-color: var(--color-cool);
+}
+
+nav.tab-nav {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--color-rule);
+}
+.tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--color-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.5rem 0.875rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  min-height: 44px;
+  min-width: 44px;
+  transition: color 120ms ease, background-color 120ms ease;
+}
+.tab-btn:hover {
+  color: var(--color-ink);
+  background: var(--color-paper-2);
+}
+.tab-btn:active {
+  transform: translateY(1px);
+}
+.tab-btn[aria-selected="true"] {
+  color: var(--color-ink);
+  background: var(--color-paper-2);
+  border-color: var(--color-rule);
+  box-shadow: 0 -2px 0 var(--color-accent) inset;
+}
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+.grid-two {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+.panel {
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-card);
+  padding: 1.25rem;
+}
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.625rem;
+  border-bottom: 1px solid var(--color-rule);
+}
+.panel-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.data-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  font-size: 0.875rem;
+  border-bottom: 1px solid var(--color-rule);
+}
+.data-row:last-child { border-bottom: none; }
+.data-label { color: var(--color-muted); }
+.data-val { font-family: var(--font-mono); font-weight: 500; }
+
+button, .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  border: 1px solid transparent;
+  padding: 0.5rem 0.875rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  min-height: 44px;
+  min-width: 44px;
+  transition: opacity 120ms ease, background-color 120ms ease;
+}
+button:hover, .btn:hover {
+  opacity: 0.9;
+}
+button:active, .btn:active {
+  transform: translateY(1px);
+}
+button:disabled, .btn:disabled, input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-subtle {
+  background: var(--color-paper-3);
+  color: var(--color-ink-2);
+  border-color: var(--color-rule);
+}
+.btn-subtle:hover {
+  background: var(--color-paper);
+}
+
+label {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+  margin-bottom: 0.375rem;
+}
+input[type="text"], select, textarea {
+  width: 100%;
+  background: var(--color-paper-3);
+  border: 1px solid var(--color-rule);
+  color: var(--color-ink);
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-family: inherit;
+  margin-bottom: 0.75rem;
+}
+textarea { resize: vertical; min-height: 96px; }
+
+.stream-box {
+  background: var(--color-paper-3);
+  border: 1px dashed var(--color-rule-2);
+  border-radius: 2px;
+  padding: 1.25rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--color-ok);
+  white-space: pre-wrap;
+  min-height: 140px;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-sm);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+th, td {
+  text-align: left;
+  padding: 0.625rem 0.875rem;
+  border-bottom: 1px solid var(--color-rule);
+}
+th {
+  background: var(--color-paper-3);
+  color: var(--color-muted);
+  font-weight: 500;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--color-paper); }
+
+pre {
+  background: var(--color-paper-3);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-sm);
+  padding: 0.875rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--color-ink-2);
+  overflow-x: auto;
+  line-height: 1.5;
+}
+
+.probe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+.probe-cell {
+  background: var(--color-paper-3);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem;
+}
+
+.htmx-indicator { display: none; opacity: 0; }
+.htmx-request .htmx-indicator, .htmx-request.htmx-indicator { display: inline-flex; opacity: 1; }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <div class="container">
+    <header role="banner">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 3v18"></path><path d="M3 12h18"></path></svg>
+        </div>
+        <div>
+          <div class="brand-title">Route Gateway</div>
+          <div class="brand-sub">Console for keyless AI routing and proxy rotation</div>
+        </div>
+      </div>
+      <div class="header-meta">
+        <span class="tag tag-ok" id="pool-badge">live proxies</span>
+        <span class="tag tag-cool" id="endpoint-badge">/v1</span>
+        <button class="btn-subtle" onclick="switchTab('tab-connect')">Connect guide</button>
+      </div>
+    </header>
+
+    <div class="panel" style="margin-bottom: 1.25rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.75rem;">
+      <div>
+        <div style="font-size: 0.875rem; font-weight: 600;">Authentication credential</div>
+        <div style="font-size: 0.8125rem; color: var(--color-muted);">HTTP Basic: <code style="color:var(--color-ink);">admin:pass</code> · Custom API Key / Bearer: <code style="color:var(--color-ink);">pass:pass</code></div>
+      </div>
+      <div style="display: flex; gap: 0.5rem; flex: 1; min-width: 260px; max-width: 480px;">
+        <input type="text" id="global-auth-key" value="pass:pass" placeholder="Enter API Key / Credential" style="margin-bottom: 0; font-family: var(--font-mono);" />
+        <button onclick="saveAuthKey()">Apply</button>
+      </div>
+    </div>
+
+    <nav class="tab-nav" role="tablist" aria-label="Navigation tabs">
+      <button class="tab-btn" id="tab-btn-dashboard" role="tab" aria-selected="true" aria-controls="tab-dashboard" onclick="switchTab('tab-dashboard')">
+        Overview and telemetry
+      </button>
+      <button class="tab-btn" id="tab-btn-playground" role="tab" aria-selected="false" aria-controls="tab-playground" onclick="switchTab('tab-playground')">
+        Playground
+      </button>
+      <button class="tab-btn" id="tab-btn-models" role="tab" aria-selected="false" aria-controls="tab-models" onclick="switchTab('tab-models')">
+        Models catalog
+      </button>
+      <button class="tab-btn" id="tab-btn-proxy" role="tab" aria-selected="false" aria-controls="tab-proxy" onclick="switchTab('tab-proxy')">
+        Proxy pool and probes
+      </button>
+      <button class="tab-btn" id="tab-btn-connect" role="tab" aria-selected="false" aria-controls="tab-connect" onclick="switchTab('tab-connect')">
+        Integration guides
+      </button>
+    </nav>
+
+    <main id="main-content">
+      <section id="tab-dashboard" class="tab-panel active" role="tabpanel" aria-labelledby="tab-btn-dashboard">
+        <div class="grid-two">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="panel-title">Upstream health and latency</span>
+              <button class="btn-subtle"
+                      hx-get="/partials/ping"
+                      hx-target="#ping-matrix"
+                      hx-indicator="#ping-spinner">
+                <span class="htmx-indicator" id="ping-spinner">checking </span>Run ping
+              </button>
+            </div>
+            <div id="ping-matrix"
+                 hx-get="/partials/ping"
+                 hx-trigger="load"
+                 hx-swap="innerHTML">
+              <div class="data-row"><span class="data-label">Zen (OpenCode)</span><span class="data-val">Checking</span></div>
+              <div class="data-row"><span class="data-label">KiloCode</span><span class="data-val">Checking</span></div>
+              <div class="data-row"><span class="data-label">LLM7</span><span class="data-val">Checking</span></div>
+              <div class="data-row"><span class="data-label">OVHcloud</span><span class="data-val">Checking</span></div>
+            </div>
+          </div>
+
+          <div class="panel" id="status-card"
+               hx-get="/partials/status"
+               hx-trigger="load, every 12s"
+               hx-swap="outerHTML">
+            <div class="panel-head">
+              <span class="panel-title">Proxy pool status</span>
+              <span class="tag">Loading</span>
+            </div>
+            <div class="data-row"><span class="data-label">Active healthy proxies</span><span class="data-val">-</span></div>
+            <div class="data-row"><span class="data-label">Rotation method</span><span class="data-val">Atomic round-robin</span></div>
+            <div class="data-row"><span class="data-label">Failover</span><span class="data-val">Direct egress fallback</span></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-title">Standard OpenAI integration</span>
+            <button class="btn-subtle" onclick="copySnippet('curl-quick-code')">Copy cURL</button>
+          </div>
+          <pre id="curl-quick-code">curl -X POST http://localhost:17070/v1/chat/completions \
+  -H "Authorization: Bearer pass:pass" \
+  -H "Content-Type: application/json" \
+  -H "User-Agent: curl/8.0" \
+  -d '{"model": "kilo-auto/free", "messages": [{"role": "user", "content": "Hello"}], "stream": true}'</pre>
+        </div>
+      </section>
+
+      <section id="tab-playground" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-playground">
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-title">Model test runner</span>
+            <span class="tag" id="chat-stream-badge" role="status" aria-live="polite">Idle</span>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
+            <div style="flex: 2; min-width: 240px;">
+              <label for="chat-model-select">Model selection</label>
+              <select id="chat-model-select"
+                      hx-get="/partials/models-select"
+                      hx-trigger="load"
+                      hx-swap="innerHTML">
+                <option value="kilo-auto/free">kilo-auto/free (Loading catalog…)</option>
+              </select>
+            </div>
+            <div style="flex: 1; min-width: 160px; display: flex; align-items: flex-end; gap: 0.5rem; margin-bottom: 0.75rem;">
+              <button onclick="sendChatMessage()" id="chat-send-btn" style="width: 100%;">Send prompt</button>
+              <button class="btn-subtle" onclick="stopChatStream()" id="chat-stop-btn" style="display:none;">Stop</button>
+            </div>
+          </div>
+
+          <div>
+            <label for="chat-input-prompt">Prompt input (Press Ctrl + Enter to send)</label>
+            <textarea id="chat-input-prompt">Say hello in one short sentence and state your model name.</textarea>
+          </div>
+
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.375rem;">
+              <label for="chat-response-output">Assistant response</label>
+              <button class="btn-subtle" onclick="copySnippet('chat-response-output')">Copy text</button>
+            </div>
+            <div id="chat-response-output" class="stream-box">// Response streams here…</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-models" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-models">
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-title">Available models (21)</span>
+            <input type="text" id="model-filter-input" placeholder="Filter model…" onkeyup="filterModelsTable()" style="max-width: 240px; margin-bottom: 0;" />
+          </div>
+          <div class="table-wrap">
+            <table id="models-table">
+              <thead>
+                <tr>
+                  <th scope="col">Model identifier</th>
+                  <th scope="col">Provider</th>
+                  <th scope="col">Access tier</th>
+                </tr>
+              </thead>
+              <tbody id="models-table-body"
+                     hx-get="/partials/models"
+                     hx-trigger="load"
+                     hx-swap="innerHTML">
+                <tr><td colspan="3" style="color: var(--color-muted); text-align: center;">Loading models…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-proxy" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-proxy">
+        <div class="panel" style="margin-bottom: 1.25rem;">
+          <div class="panel-head">
+            <span class="panel-title">Upstream provider probes</span>
+            <button class="btn-subtle"
+                    hx-post="/api/proxy/rotate"
+                    hx-target="#probe-kilo-result">
+              Rotate proxy node
+            </button>
+          </div>
+          <div class="probe-grid">
+            <div class="probe-cell">
+              <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+                <span style="font-size:0.8125rem; font-weight:600;">KiloCode</span>
+                <button class="btn-subtle" hx-post="/api/proxy/test-provider" hx-vals='{"provider": "kilo"}' hx-target="#probe-kilo-result">Probe</button>
+              </div>
+              <div id="probe-kilo-result"><span class="tag">Ready</span></div>
+            </div>
+
+            <div class="probe-cell">
+              <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+                <span style="font-size:0.8125rem; font-weight:600;">LLM7</span>
+                <button class="btn-subtle" hx-post="/api/proxy/test-provider" hx-vals='{"provider": "llm7"}' hx-target="#probe-llm7-result">Probe</button>
+              </div>
+              <div id="probe-llm7-result"><span class="tag">Ready</span></div>
+            </div>
+
+            <div class="probe-cell">
+              <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+                <span style="font-size:0.8125rem; font-weight:600;">OVHcloud</span>
+                <button class="btn-subtle" hx-post="/api/proxy/test-provider" hx-vals='{"provider": "ovh"}' hx-target="#probe-ovh-result">Probe</button>
+              </div>
+              <div id="probe-ovh-result"><span class="tag">Ready</span></div>
+            </div>
+
+            <div class="probe-cell">
+              <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+                <span style="font-size:0.8125rem; font-weight:600;">Zen (OpenCode)</span>
+                <button class="btn-subtle" hx-post="/api/proxy/test-provider" hx-vals='{"provider": "zen"}' hx-target="#probe-zen-result">Probe</button>
+              </div>
+              <div id="probe-zen-result"><span class="tag">Ready</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-title">Validated HTTPS proxy nodes</span>
+            <button class="btn-subtle" hx-get="/partials/proxies" hx-target="#proxies-table-body">Refresh</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Node address</th>
+                  <th scope="col">HTTPS latency</th>
+                  <th scope="col">Failures</th>
+                  <th scope="col">Condition</th>
+                </tr>
+              </thead>
+              <tbody id="proxies-table-body"
+                     hx-get="/partials/proxies"
+                     hx-trigger="load"
+                     hx-swap="innerHTML">
+                <tr><td colspan="4" style="color: var(--color-muted); text-align: center;">Loading nodes…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-connect" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-connect">
+        <div class="grid-two">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="panel-title">Cursor setup</span>
+              <button class="btn-subtle" onclick="copySnippet('cursor-config')">Copy</button>
+            </div>
+            <pre id="cursor-config">Base URL: http://localhost:17070/v1
+API Key:  pass:pass
+Model:    kilo-auto/free</pre>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <span class="panel-title">Claude Code / Terminal</span>
+              <button class="btn-subtle" onclick="copySnippet('claude-config')">Copy</button>
+            </div>
+            <pre id="claude-config">export OPENAI_BASE_URL="http://localhost:17070/v1"
+export OPENAI_API_KEY="pass:pass"
+export OPENAI_MODEL="kilo-auto/free"</pre>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <span class="panel-title">Cline / Roo Code</span>
+              <button class="btn-subtle" onclick="copySnippet('cline-config')">Copy</button>
+            </div>
+            <pre id="cline-config">Base URL: http://localhost:17070/v1
+API Key:  pass:pass
+Model ID: codestral-latest</pre>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <span class="panel-title">Python OpenAI SDK</span>
+              <button class="btn-subtle" onclick="copySnippet('python-config')">Copy</button>
+            </div>
+            <pre id="python-config">from openai import OpenAI
+
+client = OpenAI(
+    base_url="http://localhost:17070/v1",
+    api_key="pass:pass"
+)
+
+res = client.chat.completions.create(
+    model="kilo-auto/free",
+    messages=[{"role": "user", "content": "Hi"}]
+)
+print(res.choices[0].message.content)</pre>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="route-toast" style="display:none; position:fixed; bottom:20px; right:20px; background:var(--color-accent); color:var(--color-accent-ink); padding:8px 16px; border-radius:var(--radius-sm); font-size:0.8125rem; font-weight:600; z-index:9999; box-shadow:0 4px 12px var(--color-shadow);"></div>
+
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.setAttribute('aria-selected', 'false'));
+      const p = document.getElementById(tabId);
+      if (p) p.classList.add('active');
+      const b = document.getElementById('tab-btn-' + tabId.replace('tab-', ''));
+      if (b) b.setAttribute('aria-selected', 'true');
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('route-toast');
+      if (!t) return;
+      t.innerText = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 2200);
+    }
+
+    function getAuthKey() {
+      return localStorage.getItem('route_auth_key') || 'pass:pass';
+    }
+
+    async function saveAuthKey() {
+      const val = document.getElementById('global-auth-key').value.trim();
+      const keyToSave = val || 'pass:pass';
+      localStorage.setItem('route_auth_key', keyToSave);
+
+      // Sync custom API key to server runtime
+      try {
+        await fetch('/api/settings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': getFormattedAuthHeader()
+          },
+          body: JSON.stringify({ api_key: keyToSave })
+        });
+      } catch (e) {}
+
+      showToast('Credential updated: ' + keyToSave);
+    }
+
+    function getFormattedAuthHeader() {
+      const key = getAuthKey();
+      if (!key) return 'Bearer pass:pass';
+      if (key.startsWith('Basic ') || key.startsWith('Bearer ')) return key;
+      return 'Bearer ' + key;
+    }
+
+    function initDynamicHost() {
+      const endpoint = window.location.origin + '/v1';
+      const badge = document.getElementById('endpoint-badge');
+      if (badge && window.location.origin && window.location.origin !== 'null') {
+        badge.innerText = endpoint;
+      }
+      ['curl-quick-code', 'cursor-config', 'claude-config', 'cline-config', 'python-config'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && window.location.origin && window.location.origin !== 'null') {
+          el.innerHTML = el.innerHTML.replaceAll('http://localhost:17070/v1', endpoint);
+        }
+      });
+    }
+    initDynamicHost();
+
+    document.body.addEventListener('htmx:configRequest', function(evt) {
+      evt.detail.headers['Authorization'] = getFormattedAuthHeader();
+    });
+
+    function copySnippet(id) {
+      const el = document.getElementById(id);
+      navigator.clipboard.writeText(el.innerText || el.textContent).then(() => {
+        showToast('Copied to clipboard');
+      });
+    }
+
+    function filterModelsTable() {
+      const q = document.getElementById('model-filter-input').value.toLowerCase();
+      document.querySelectorAll('#models-table-body tr').forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    }
+
+    document.getElementById('chat-input-prompt')?.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        sendChatMessage();
+      }
+    });
+
+    let activeAbort = null;
+
+    function stopChatStream() {
+      if (activeAbort) {
+        activeAbort.abort();
+        activeAbort = null;
+      }
+      document.getElementById('chat-stop-btn').style.display = 'none';
+      document.getElementById('chat-send-btn').style.display = 'inline-flex';
+      const b = document.getElementById('chat-stream-badge');
+      b.innerText = 'Stopped';
+      b.className = 'tag tag-warn';
+    }
+
+    async function sendChatMessage() {
+      const output = document.getElementById('chat-response-output');
+      const badge = document.getElementById('chat-stream-badge');
+      const sendBtn = document.getElementById('chat-send-btn');
+      const stopBtn = document.getElementById('chat-stop-btn');
+      const model = document.getElementById('chat-model-select').value;
+      const prompt = document.getElementById('chat-input-prompt').value.trim();
+
+      if (!prompt) return;
+
+      output.innerText = 'Connecting…\n';
+      badge.innerText = 'Streaming';
+      badge.className = 'tag tag-warn';
+      sendBtn.style.display = 'none';
+      stopBtn.style.display = 'inline-flex';
+
+      activeAbort = new AbortController();
+
+      try {
+        const res = await fetch('/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': getFormattedAuthHeader(),
+            'User-Agent': 'curl/8.0'
+          },
+          body: JSON.stringify({
+            model: model,
+            messages: [{ role: 'user', content: prompt }],
+            stream: true
+          }),
+          signal: activeAbort.signal
+        });
+
+        if (!res.ok) {
+          const errText = await res.text();
+          output.innerText = 'Error ' + res.status + ': ' + errText;
+          badge.innerText = 'Error';
+          badge.className = 'tag tag-bad';
+          stopChatStream();
+          return;
+        }
+
+        output.innerText = '';
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop();
+
+          for (const line of lines) {
+            const clean = line.trim();
+            if (clean.startsWith('data: ')) {
+              const dataStr = clean.slice(6);
+              if (dataStr === '[DONE]') continue;
+              try {
+                const parsed = JSON.parse(dataStr);
+                const delta = parsed.choices?.[0]?.delta?.content || '';
+                output.innerText += delta;
+                output.scrollTop = output.scrollHeight;
+              } catch (err) {}
+            }
+          }
+        }
+        badge.innerText = 'Completed';
+        badge.className = 'tag tag-ok';
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          output.innerText += '\nFailed: ' + err;
+          badge.innerText = 'Failed';
+          badge.className = 'tag tag-bad';
+        }
+      } finally {
+        stopChatStream();
+      }
+    }
+
+    document.getElementById('global-auth-key').value = getAuthKey();
+
+    document.addEventListener('visibilitychange', () => {
+      const sc = document.getElementById('status-card');
+      if (!sc) return;
+      if (document.hidden) {
+        sc.setAttribute('hx-trigger', 'none');
+      } else {
+        sc.setAttribute('hx-trigger', 'load, every 12s');
+        htmx.process(sc);
+      }
+    });
+  </script>
+</body>
+</html>

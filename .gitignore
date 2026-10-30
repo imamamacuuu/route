@@ -1,0 +1,35 @@
+# Dynamic Runtime State
+*.log
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+*.db
+
+# Secrets & Environment Variables
+.env
+.env.*
+!.env.example
+!.env.patch
+
+# Python Caches & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# OS & Editor Artifacts
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.bak
+*.tmp
+.hallmark/
